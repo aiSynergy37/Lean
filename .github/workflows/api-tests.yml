@@ -13,16 +13,31 @@ jobs:
     # Only run on push events (not on pull_request) for security reasons in order to be able to use secrets
     if: ${{ github.event_name == 'push' }}
     steps:
+      - name: Validate API secrets
+        id: api-secrets
+        run: |
+          if [ -z "${{ secrets.QC_JOB_USER_ID }}" ] || [ -z "${{ secrets.QC_API_ACCESS_TOKEN }}" ] || [ -z "${{ secrets.QC_JOB_ORGANIZATION_ID }}" ]; then
+            echo "has_secrets=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Skipping API Tests because QC_JOB_USER_ID, QC_API_ACCESS_TOKEN, or QC_JOB_ORGANIZATION_ID is not configured."
+          else
+            echo "has_secrets=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout
+        if: steps.api-secrets.outputs.has_secrets == 'true'
         uses: actions/checkout@v2
+
       - name: Liberate disk space
+        if: steps.api-secrets.outputs.has_secrets == 'true'
         uses: jlumbroso/free-disk-space@main
         with:
           tool-cache: true
           large-packages: false
           docker-images: false
           swap-storage: false
+
       - name: Run API Tests
+        if: steps.api-secrets.outputs.has_secrets == 'true'
         uses: addnab/docker-run-action@v3
         with:
           image: quantconnect/lean:foundation
