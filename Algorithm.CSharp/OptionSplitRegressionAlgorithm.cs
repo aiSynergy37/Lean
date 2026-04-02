@@ -168,7 +168,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Lowest Capacity Asset", "AAPL VRCWOCTRVDJA|AAPL R735QTJ8XC9X"},
             {"Portfolio Turnover", "0.04%"},
             {"Drawdown Recovery", "0"},
-            {"OrderListHash", "6753be1c117f9528f920eb84976a070f"}
+            {"OrderListHash", "320813ddb0f9f942cecdf1dc56f5f668"}
         };
     }
 }

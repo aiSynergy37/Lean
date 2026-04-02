@@ -147,7 +147,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Lowest Capacity Asset", "SPXW 31K54PVWHYTTA|SPX 31"},
             {"Portfolio Turnover", "0.40%"},
             {"Drawdown Recovery", "0"},
-            {"OrderListHash", "03148bbb5453fc1056a3285bd31ce158"}
+            {"OrderListHash", "7be46bf5c5f81bbf76e1e91250574238"}
         };
     }
 }

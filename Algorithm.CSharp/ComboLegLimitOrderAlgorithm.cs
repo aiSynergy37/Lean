@@ -124,7 +124,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Lowest Capacity Asset", "GOOCV W78ZERHAT67A|GOOCV VP83T1ZUHROL"},
             {"Portfolio Turnover", "30.22%"},
             {"Drawdown Recovery", "0"},
-            {"OrderListHash", "6168ffaa5b9f3c389f5da52e90455889"}
+            {"OrderListHash", "659d0be338e79c34dbb4e983771f3077"}
         };
     }
 }

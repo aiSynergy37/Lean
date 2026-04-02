@@ -154,7 +154,7 @@ namespace QuantConnect.Algorithm.CSharp.RegressionTests
             {"Lowest Capacity Asset", "SPXW XKX6S2GMDZSE|SPX 31"},
             {"Portfolio Turnover", "0.01%"},
             {"Drawdown Recovery", "0"},
-            {"OrderListHash", "ad9c0f3aa3b311065df12bcff9a2b4de"}
+            {"OrderListHash", "8751889794d0bb2b2824a7a6876bae21"}
         };
     }
 }
