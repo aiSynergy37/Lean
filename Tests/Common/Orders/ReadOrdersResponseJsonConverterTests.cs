@@ -495,7 +495,7 @@ namespace QuantConnect.Tests.Common.Orders
             },
             ""securityType"": 2,
             ""direction"": 0,
-            ""value"": 138513.986945,
+            ""value"": 138513.986945000,
             ""orderSubmissionData"": {
                 ""bidPrice"": 138.505714984,
                 ""askPrice"": 138.513986945,
@@ -614,7 +614,7 @@ namespace QuantConnect.Tests.Common.Orders
             },
             ""securityType"": 2,
             ""direction"": 0,
-            ""value"": 138513.986945,
+            ""value"": 138513.986945000,
             ""orderSubmissionData"": {
                 ""bidPrice"": 138.505714984,
                 ""askPrice"": 138.513986945,
@@ -686,7 +686,7 @@ namespace QuantConnect.Tests.Common.Orders
             },
             ""securityType"": 2,
             ""direction"": 0,
-            ""value"": 138513.986945,
+            ""value"": 138513.986945000,
             ""orderSubmissionData"": {
                 ""bidPrice"": 138.505714984,
                 ""askPrice"": 138.513986945,
@@ -759,7 +759,7 @@ namespace QuantConnect.Tests.Common.Orders
             },
             ""securityType"": 2,
             ""direction"": 0,
-            ""value"": 138513.986945,
+            ""value"": 138513.986945000,
             ""orderSubmissionData"": {
                 ""bidPrice"": 138.505714984,
                 ""askPrice"": 138.513986945,
@@ -1112,7 +1112,7 @@ namespace QuantConnect.Tests.Common.Orders
     },
     ""SecurityType"": 2,
     ""Direction"": 0,
-    ""Value"": 138513.986945,
+    ""Value"": 138513.986945000,
     ""OrderSubmissionData"": {
         ""BidPrice"": 138.505714984,
         ""AskPrice"": 138.513986945,
@@ -1192,7 +1192,7 @@ namespace QuantConnect.Tests.Common.Orders
     },
     ""SecurityType"": 2,
     ""Direction"": 0,
-    ""Value"": 138513.986945,
+    ""Value"": 138513.986945000,
     ""OrderSubmissionData"": {
         ""BidPrice"": 138.505714984,
         ""AskPrice"": 138.513986945,
@@ -1245,7 +1245,7 @@ namespace QuantConnect.Tests.Common.Orders
     },
     ""SecurityType"": 2,
     ""Direction"": 0,
-    ""Value"": 138513.986945,
+    ""Value"": 138513.986945000,
     ""OrderSubmissionData"": {
         ""BidPrice"": 138.505714984,
         ""AskPrice"": 138.513986945,
@@ -1299,7 +1299,7 @@ namespace QuantConnect.Tests.Common.Orders
     },
     ""SecurityType"": 2,
     ""Direction"": 0,
-    ""Value"": 138513.986945,
+    ""Value"": 138513.986945000,
     ""OrderSubmissionData"": {
         ""BidPrice"": 138.505714984,
         ""AskPrice"": 138.513986945,
