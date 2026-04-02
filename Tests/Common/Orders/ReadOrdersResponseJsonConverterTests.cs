@@ -100,7 +100,8 @@ namespace QuantConnect.Tests.Common.Orders
             Assert.AreEqual(TimeInForce.GoodTilCanceled.ToString(), order.Properties.TimeInForce.ToString(), "Failed in Order.Properties.TimeInForce");
             Assert.AreEqual(securityType, order.SecurityType, "Failed in Order.SecurityType");
             Assert.AreEqual(OrderDirection.Buy, order.Direction, "Failed in Order.Direction");
-            Assert.AreEqual(1385.139869450m, order.Value, "Failed in Order.Value");
+            var expectedValue = securityType == SecurityType.Option ? 138513.986945m : 1385.139869450m;
+            Assert.AreEqual(expectedValue, order.Value, "Failed in Order.Value");
             Assert.AreEqual(138.505714984m, order.OrderSubmissionData.BidPrice, "Failed in Order.OrderSubmissionData.BidPrice");
             Assert.AreEqual(138.513986945m, order.OrderSubmissionData.AskPrice, "Failed in Order.OrderSubmissionData.AskPrice");
             Assert.AreEqual(138.505714984m, order.OrderSubmissionData.LastPrice, "Failed in Order.OrderSubmissionData.LastPrice");
@@ -494,7 +495,7 @@ namespace QuantConnect.Tests.Common.Orders
             },
             ""securityType"": 2,
             ""direction"": 0,
-            ""value"": 1385.139869450,
+            ""value"": 138513.986945,
             ""orderSubmissionData"": {
                 ""bidPrice"": 138.505714984,
                 ""askPrice"": 138.513986945,
@@ -613,7 +614,7 @@ namespace QuantConnect.Tests.Common.Orders
             },
             ""securityType"": 2,
             ""direction"": 0,
-            ""value"": 1385.139869450,
+            ""value"": 138513.986945,
             ""orderSubmissionData"": {
                 ""bidPrice"": 138.505714984,
                 ""askPrice"": 138.513986945,
@@ -685,7 +686,7 @@ namespace QuantConnect.Tests.Common.Orders
             },
             ""securityType"": 2,
             ""direction"": 0,
-            ""value"": 1385.139869450,
+            ""value"": 138513.986945,
             ""orderSubmissionData"": {
                 ""bidPrice"": 138.505714984,
                 ""askPrice"": 138.513986945,
@@ -758,7 +759,7 @@ namespace QuantConnect.Tests.Common.Orders
             },
             ""securityType"": 2,
             ""direction"": 0,
-            ""value"": 1385.139869450,
+            ""value"": 138513.986945,
             ""orderSubmissionData"": {
                 ""bidPrice"": 138.505714984,
                 ""askPrice"": 138.513986945,
@@ -1111,7 +1112,7 @@ namespace QuantConnect.Tests.Common.Orders
     },
     ""SecurityType"": 2,
     ""Direction"": 0,
-    ""Value"": 1385.139869450,
+    ""Value"": 138513.986945,
     ""OrderSubmissionData"": {
         ""BidPrice"": 138.505714984,
         ""AskPrice"": 138.513986945,
@@ -1191,7 +1192,7 @@ namespace QuantConnect.Tests.Common.Orders
     },
     ""SecurityType"": 2,
     ""Direction"": 0,
-    ""Value"": 1385.139869450,
+    ""Value"": 138513.986945,
     ""OrderSubmissionData"": {
         ""BidPrice"": 138.505714984,
         ""AskPrice"": 138.513986945,
@@ -1244,7 +1245,7 @@ namespace QuantConnect.Tests.Common.Orders
     },
     ""SecurityType"": 2,
     ""Direction"": 0,
-    ""Value"": 1385.139869450,
+    ""Value"": 138513.986945,
     ""OrderSubmissionData"": {
         ""BidPrice"": 138.505714984,
         ""AskPrice"": 138.513986945,
@@ -1298,7 +1299,7 @@ namespace QuantConnect.Tests.Common.Orders
     },
     ""SecurityType"": 2,
     ""Direction"": 0,
-    ""Value"": 1385.139869450,
+    ""Value"": 138513.986945,
     ""OrderSubmissionData"": {
         ""BidPrice"": 138.505714984,
         ""AskPrice"": 138.513986945,

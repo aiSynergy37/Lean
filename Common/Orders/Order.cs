@@ -16,6 +16,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using Newtonsoft.Json;
@@ -195,13 +196,44 @@ namespace QuantConnect.Orders
         /// Deprecated
         /// </summary>
         [JsonProperty(PropertyName = "value"), Obsolete("Please use Order.GetValue(security) or security.Holdings.HoldingsValue")]
-        public decimal Value => Quantity * Price;
+        public decimal Value => Quantity * Price * GetContractMultiplierForValue();
 
         /// <summary>
         /// Gets the price data at the time the order was submitted
         /// </summary>
         [JsonProperty(PropertyName = "orderSubmissionData")]
         public OrderSubmissionData OrderSubmissionData { get; internal set; }
+
+        private decimal GetContractMultiplierForValue()
+        {
+            if (Symbol == null || Symbol == Symbol.Empty)
+            {
+                return 1m;
+            }
+
+            var market = Symbol.ID.Market;
+            if (string.IsNullOrEmpty(market))
+            {
+                return 1m;
+            }
+
+            var quoteCurrency = string.IsNullOrEmpty(PriceCurrency) ? Currencies.USD : PriceCurrency;
+            try
+            {
+                return SymbolPropertiesDatabase
+                    .FromDataFolder()
+                    .GetSymbolProperties(market, Symbol, SecurityType, quoteCurrency)
+                    .ContractMultiplier;
+            }
+            catch (DirectoryNotFoundException)
+            {
+                return 1m;
+            }
+            catch (FileNotFoundException)
+            {
+                return 1m;
+            }
+        }
 
         /// <summary>
         /// Returns true if the order is a marketable order.
