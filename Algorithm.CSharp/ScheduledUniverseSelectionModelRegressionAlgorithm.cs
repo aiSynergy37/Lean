@@ -228,7 +228,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Profit-Loss Ratio", "1.39"},
             {"Alpha", "0.477"},
             {"Beta", "0.042"},
-            {"Annual Standard Deviation", "0.066"},
+            {"Annual Standard Deviation", "0.067"},
             {"Annual Variance", "0.004"},
             {"Information Ratio", "3.893"},
             {"Tracking Error", "0.083"},
