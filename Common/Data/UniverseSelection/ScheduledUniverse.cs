@@ -105,9 +105,9 @@ namespace QuantConnect.Data.UniverseSelection
         /// <summary>
         /// Get an enumerator of UTC DateTimes that defines when this universe will be invoked
         /// </summary>
-        /// <param name="startTimeUtc">The start time of the range in UTC</param>
-        /// <param name="endTimeUtc">The end time of the range in UTC</param>
-        /// <returns>An enumerator of UTC DateTimes that defines when this universe will be invoked</returns>
+        /// <param name="startTimeUtc">The inclusive start time of the range in UTC</param>
+        /// <param name="endTimeUtc">The inclusive end time of the range in UTC</param>
+        /// <returns>An enumerator of UTC DateTimes within the provided inclusive bounds that defines when this universe will be invoked</returns>
         public IEnumerable<DateTime> GetTriggerTimes(DateTime startTimeUtc, DateTime endTimeUtc, MarketHoursDatabase marketHoursDatabase)
         {
             var startTimeLocal = startTimeUtc.ConvertFromUtc(Configuration.ExchangeTimeZone);
@@ -115,27 +115,25 @@ namespace QuantConnect.Data.UniverseSelection
 
             // define date/time rule enumerable
             var dates = _dateRule.GetDates(startTimeLocal, endTimeLocal);
-            var times = _timeRule.CreateUtcEventTimes(dates).GetEnumerator();
+            using var times = _timeRule.CreateUtcEventTimes(dates).GetEnumerator();
 
-            // Make sure and filter out any times before our start time
-            // GH #5440
-            do
+            while (times.MoveNext())
             {
-                if (!times.MoveNext())
+                var time = times.Current;
+                if (time < startTimeUtc)
                 {
-                    times.Dispose();
+                    // Make sure and filter out any times before our start time
+                    // GH #5440
+                    continue;
+                }
+
+                if (time > endTimeUtc)
+                {
                     yield break;
                 }
-            }
-            while (times.Current < startTimeUtc);
 
-            // Start yielding times
-            do
-            {
-                yield return times.Current;
+                yield return time;
             }
-            while (times.MoveNext());
-            times.Dispose();
         }
 
         private static SubscriptionDataConfig CreateConfiguration(DateTimeZone timeZone, IDateRule dateRule, ITimeRule timeRule)

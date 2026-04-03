@@ -107,5 +107,27 @@ namespace QuantConnect.Tests.Common.Data.UniverseSelection
             // Assert that its empty
             Assert.IsTrue(!triggerTimesUtc.Any());
         }
+
+        [Test]
+        public void TriggerTimesRespectInclusiveBounds()
+        {
+            var start = new DateTime(2000, 1, 5, 15, 0, 0);
+            var end = new DateTime(2000, 1, 5, 15, 3, 0);
+
+            using var universe = new ScheduledUniverse(
+                _dateRules.EveryDay(),
+                _timeRules.Every(TimeSpan.FromMinutes(1)),
+                _ => new List<Symbol>());
+
+            var triggerTimesLocal = universe
+                .GetTriggerTimes(start.ConvertToUtc(_timezone), end.ConvertToUtc(_timezone), MarketHoursDatabase.AlwaysOpen)
+                .Select(time => time.ConvertFromUtc(_timezone))
+                .ToList();
+
+            Assert.AreEqual(4, triggerTimesLocal.Count);
+            Assert.AreEqual(start, triggerTimesLocal.First());
+            Assert.AreEqual(end, triggerTimesLocal.Last());
+            Assert.IsTrue(triggerTimesLocal.All(time => time >= start && time <= end));
+        }
     }
 }
