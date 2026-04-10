@@ -25,7 +25,7 @@ jobs:
 
       - name: Checkout
         if: steps.api-secrets.outputs.has_secrets == 'true'
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Liberate disk space
         if: steps.api-secrets.outputs.has_secrets == 'true'

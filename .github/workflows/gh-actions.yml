@@ -10,9 +10,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    # Skip noisy full-suite runs on fork pushes; upstream repo and PR runs are still covered.
+    if: ${{ github.repository == 'QuantConnect/Lean' || github.event_name == 'pull_request' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Ensures we fetch all history
 
