@@ -10,9 +10,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    # Run this workflow only on the upstream repository.
+    if: ${{ github.repository == 'QuantConnect/Lean' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Liberate disk space
         uses: jlumbroso/free-disk-space@main
         with:
