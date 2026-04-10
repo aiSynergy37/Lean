@@ -10,15 +10,17 @@ on:
 jobs:
   build:
     runs-on: self-hosted
+    # Run this workflow only on the upstream repository.
+    if: ${{ github.repository == 'QuantConnect/Lean' }}
     container:
         image: quantconnect/lean:foundation
         volumes:
           - /nas:/Data
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Checkout Lean Master
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: QuantConnect/Lean
           path: LeanMaster

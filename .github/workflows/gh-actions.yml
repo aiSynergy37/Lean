@@ -10,8 +10,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-24.04
-    # Skip noisy full-suite runs on fork pushes; upstream repo and PR runs are still covered.
-    if: ${{ github.repository == 'QuantConnect/Lean' || github.event_name == 'pull_request' }}
+    # Run this heavy workflow only on the upstream repository.
+    if: ${{ github.repository == 'QuantConnect/Lean' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
