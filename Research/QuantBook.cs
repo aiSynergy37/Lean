@@ -398,7 +398,6 @@ namespace QuantConnect.Research
             // Load a canonical option Symbol if the user provides us with an underlying Symbol
             symbol = GetOptionSymbolForHistoryRequest(symbol, null, resolution, fillForward);
 
-            IEnumerable<Symbol> symbols;
             if (symbol.IsCanonical())
             {
                 // canonical symbol, lets find the contracts
@@ -438,28 +437,41 @@ namespace QuantConnect.Research
                     }
                 }
 
-                var allSymbols = new HashSet<Symbol>();
                 var optionFilterUniverse = new OptionFilterUniverse(option);
+                var historyRequests = new List<QuantConnect.Data.HistoryRequest>();
 
                 foreach (var (date, chainData, underlyingData) in GetChainHistory<OptionUniverse>(option, start, end.Value, extendedMarketHours))
                 {
                     if (underlyingData is not null)
                     {
                         optionFilterUniverse.Refresh(chainData, underlyingData, underlyingData.EndTime);
-                        allSymbols.UnionWith(option.ContractFilter.Filter(optionFilterUniverse).Select(x => x.Symbol));
+                        var symbolsForDate = option.ContractFilter.Filter(optionFilterUniverse).Select(x => x.Symbol).ToArray();
+                        if (symbolsForDate.Length == 0)
+                        {
+                            continue;
+                        }
+
+                        // Keep option history requests constrained to the date where each contract passed the filter.
+                        var requestStart = start > date ? start : date;
+                        var requestEnd = end.Value < date.AddDays(1) ? end.Value : date.AddDays(1);
+                        if (requestEnd <= requestStart)
+                        {
+                            continue;
+                        }
+
+                        historyRequests.AddRange(CreateDateRangeHistoryRequests(symbolsForDate, requestStart, requestEnd,
+                            resolution, fillForward, extendedMarketHours));
                     }
                 }
 
-                var distinctSymbols = allSymbols.Distinct().Select(x => new OptionUniverse() { Symbol = x, Time = start });
-                symbols = allSymbols.Concat(new[] { symbol.Underlying });
-            }
-            else
-            {
-                // the symbol is a contract
-                symbols = new List<Symbol> { symbol };
+                historyRequests.AddRange(CreateDateRangeHistoryRequests(new[] { symbol.Underlying }, start, end.Value,
+                    resolution, fillForward, extendedMarketHours));
+
+                return new OptionHistory(History(historyRequests));
             }
 
-            return new OptionHistory(History(symbols, start, end.Value, resolution, fillForward, extendedMarketHours));
+            // the symbol is a contract
+            return new OptionHistory(History(new[] { symbol }, start, end.Value, resolution, fillForward, extendedMarketHours));
         }
 
         /// <summary>
