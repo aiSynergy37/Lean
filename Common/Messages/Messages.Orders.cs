@@ -363,10 +363,12 @@ namespace QuantConnect
             /// to make it
             /// </summary>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static string WarmingUp(Orders.OrderRequest request)
+            public static string WarmingUp(Orders.OrderRequest request, bool usePythonMethodNames = false)
             {
-                return Invariant($@"This operation is not allowed in Initialize or during warm up: OrderRequest.{
-                    request.OrderRequestType}. Please move this code to the OnWarmupFinished() method.");
+                var initializeMethodName = usePythonMethodNames ? "initialize" : "Initialize";
+                var onWarmupFinishedMethodName = usePythonMethodNames ? "on_warmup_finished" : "OnWarmupFinished";
+                return Invariant($@"This operation is not allowed in {initializeMethodName} or during warm up: OrderRequest.{
+                    request.OrderRequestType}. Please move this code to the {onWarmupFinishedMethodName}() method.");
             }
         }
 

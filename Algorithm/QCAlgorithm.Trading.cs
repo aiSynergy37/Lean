@@ -20,6 +20,7 @@ using QuantConnect.Orders.TimeInForces;
 using QuantConnect.Securities;
 using QuantConnect.Securities.Future;
 using QuantConnect.Securities.Option;
+using Python.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -997,7 +998,7 @@ namespace QuantConnect.Algorithm
         {
             if (IsWarmingUp)
             {
-                return OrderResponse.WarmingUp(request);
+                return OrderResponse.WarmingUp(request, this is IPythonDerivedType);
             }
 
             //Most order methods use security objects; so this isn't really used.

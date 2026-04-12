@@ -166,9 +166,9 @@ namespace QuantConnect.Orders
         /// <summary>
         /// Helper method to create an error response due to algorithm still in warmup mode
         /// </summary>
-        public static OrderResponse WarmingUp(OrderRequest request)
+        public static OrderResponse WarmingUp(OrderRequest request, bool usePythonMethodNames = false)
         {
-            return Error(request, OrderResponseErrorCode.AlgorithmWarmingUp, Messages.OrderResponse.WarmingUp(request));
+            return Error(request, OrderResponseErrorCode.AlgorithmWarmingUp, Messages.OrderResponse.WarmingUp(request, usePythonMethodNames));
         }
 
         #endregion

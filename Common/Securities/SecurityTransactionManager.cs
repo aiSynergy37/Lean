@@ -188,7 +188,7 @@ namespace QuantConnect.Securities
         {
             if (_algorithm != null && _algorithm.IsWarmingUp)
             {
-                throw new Exception(OrderResponse.WarmingUp(request).ToString());
+                throw new Exception(OrderResponse.WarmingUp(request, _algorithm is IPythonDerivedType).ToString());
             }
 
             var submit = request as SubmitOrderRequest;
@@ -251,7 +251,7 @@ namespace QuantConnect.Securities
         {
             if (_algorithm != null && _algorithm.IsWarmingUp)
             {
-                throw new InvalidOperationException(Messages.SecurityTransactionManager.CancelOpenOrdersNotAllowedOnInitializeOrWarmUp);
+                throw new InvalidOperationException(Messages.SecurityTransactionManager.CancelOpenOrdersNotAllowedOnInitializeOrWarmUpMessage(_algorithm is IPythonDerivedType));
             }
 
             var cancelledOrders = new List<OrderTicket>();
@@ -273,7 +273,7 @@ namespace QuantConnect.Securities
         {
             if (_algorithm != null && _algorithm.IsWarmingUp)
             {
-                throw new InvalidOperationException(Messages.SecurityTransactionManager.CancelOpenOrdersNotAllowedOnInitializeOrWarmUp);
+                throw new InvalidOperationException(Messages.SecurityTransactionManager.CancelOpenOrdersNotAllowedOnInitializeOrWarmUpMessage(_algorithm is IPythonDerivedType));
             }
 
             var cancelledOrders = new List<OrderTicket>();

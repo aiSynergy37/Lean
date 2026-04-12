@@ -962,6 +962,17 @@ namespace QuantConnect
                 "This operation is not allowed in Initialize or during warm up: CancelOpenOrders. Please move this code to the OnWarmupFinished() method.";
 
             /// <summary>
+            /// Returns a string message saying CancelOpenOrders operation is not allowed in Initialize or during warm up.
+            /// Uses snake_case method names for Python users.
+            /// </summary>
+            public static string CancelOpenOrdersNotAllowedOnInitializeOrWarmUpMessage(bool usePythonMethodNames = false)
+            {
+                var initializeMethodName = usePythonMethodNames ? "initialize" : "Initialize";
+                var onWarmupFinishedMethodName = usePythonMethodNames ? "on_warmup_finished" : "OnWarmupFinished";
+                return Invariant($"This operation is not allowed in {initializeMethodName} or during warm up: CancelOpenOrders. Please move this code to the {onWarmupFinishedMethodName}() method.");
+            }
+
+            /// <summary>
             /// Returns a string message saying the order was canceled by the CancelOpenOrders() at the given time
             /// </summary>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]

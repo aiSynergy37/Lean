@@ -48,6 +48,7 @@ namespace QuantConnect.Lean.Engine.TransactionHandlers
         private IExecutionModel _executionModel;
         private IBrokerage _brokerage;
         private bool _brokerageIsBacktesting;
+        private bool _isPythonAlgorithm;
         private bool _loggedFeeAdjustmentWarning;
 
         // Counter to keep track of total amount of processed orders
@@ -212,6 +213,7 @@ namespace QuantConnect.Lean.Engine.TransactionHandlers
                 _qcAlgorithmIntance = qcAlgorithm;
                 _signalExport = qcAlgorithm.SignalExport;
                 _executionModel = qcAlgorithm.Execution;
+                _isPythonAlgorithm = false;
             }
             else
             {
@@ -219,6 +221,7 @@ namespace QuantConnect.Lean.Engine.TransactionHandlers
                 _qcAlgorithmIntance = pyAlgorithmWrapper.BaseAlgorithm;
                 _signalExport = pyAlgorithmWrapper.SignalExport;
                 _executionModel = pyAlgorithmWrapper.Execution;
+                _isPythonAlgorithm = true;
             }
 
             NewOrderEvent += (s, e) => _signalExport.OnOrderEvent(e);
@@ -295,7 +298,7 @@ namespace QuantConnect.Lean.Engine.TransactionHandlers
         {
             var response = !_algorithm.IsWarmingUp
                 ? OrderResponse.Success(request)
-                : OrderResponse.WarmingUp(request);
+                : OrderResponse.WarmingUp(request, _isPythonAlgorithm);
 
             var shortable = true;
             if (request.Quantity < 0)
@@ -437,7 +440,7 @@ namespace QuantConnect.Lean.Engine.TransactionHandlers
                 }
                 else if (_algorithm.IsWarmingUp)
                 {
-                    request.SetResponse(OrderResponse.WarmingUp(request));
+                    request.SetResponse(OrderResponse.WarmingUp(request, _isPythonAlgorithm));
                 }
                 else if (!shortable)
                 {
@@ -506,7 +509,7 @@ namespace QuantConnect.Lean.Engine.TransactionHandlers
                 }
                 else if (_algorithm.IsWarmingUp)
                 {
-                    request.SetResponse(OrderResponse.WarmingUp(request));
+                    request.SetResponse(OrderResponse.WarmingUp(request, _isPythonAlgorithm));
                 }
                 else
                 {

@@ -103,6 +103,23 @@ namespace QuantConnect.Tests.Common.Orders
             Assert.AreEqual("This operation is not allowed in Initialize or during warm up: OrderRequest.Submit. Please move this code to the OnWarmupFinished() method.", ticket.SubmitRequest.Response.ErrorMessage);
         }
 
+        [Test]
+        public void WarmingUpMessageUsesSnakeCaseMethodNamesForPython()
+        {
+            var orderRequest = new SubmitOrderRequest(OrderType.Market, SecurityType.Equity, Symbols.AAPL, 1, 0, 0, _requestTime, string.Empty);
+            var message = QuantConnect.Messages.OrderResponse.WarmingUp(orderRequest, usePythonMethodNames: true);
+
+            Assert.AreEqual("This operation is not allowed in initialize or during warm up: OrderRequest.Submit. Please move this code to the on_warmup_finished() method.", message);
+        }
+
+        [Test]
+        public void CancelOpenOrdersWarmupMessageUsesSnakeCaseMethodNamesForPython()
+        {
+            var message = QuantConnect.Messages.SecurityTransactionManager.CancelOpenOrdersNotAllowedOnInitializeOrWarmUpMessage(usePythonMethodNames: true);
+
+            Assert.AreEqual("This operation is not allowed in initialize or during warm up: CancelOpenOrders. Please move this code to the on_warmup_finished() method.", message);
+        }
+
         [TestCase(8, 0, true, Description = "8 AM - valid submission")]
         [TestCase(12, 0, false, Description = "12 PM - invalid submission")]
         [TestCase(15, 30, false, Description = "3:30 PM - invalid submission")]
