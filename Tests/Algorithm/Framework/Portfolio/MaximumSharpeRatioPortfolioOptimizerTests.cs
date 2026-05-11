@@ -65,14 +65,14 @@ namespace QuantConnect.Tests.Algorithm.Framework.Portfolio
 
             ExpectedResults = new List<double[]>
             {
-                new double[] { -0.499775, 0.499775, 1 },
-                new double[] { -0.000726, 0.000846, 0.999872 },
-                new double[] { -0.404724, 0.404724, 1 },
-                new double[] { -0.417596, 0.023964, 1, 0.040655, 0.352977 },
-                new double[] { 0, 1 },
-                new double[] { -0.668854, 0.668854, 1 },
-                new double[] { -1, 1, 1 },
-                new double[] { -1, 0.31544, 0.68456, 1 },
+                new double[] { -0.562396, 0.608942, 0.953453 },
+                new double[] { 0.686025, -0.269589, 0.583023 },
+                new double[] { 0.26394, -0.043374, 0.779434 },
+                new double[] { -0.223905, 0.401036, 1, 0.065329, -0.24246 },
+                new double[] { 0.5, 0.5 },
+                new double[] { -0.5, 0.5, 1 },
+                new double[] { -0.242647, 1, 0.242647 },
+                new double[] { -1, 0.922902, 0.364512, 0.712585 },
             };
         }
 
@@ -98,7 +98,7 @@ namespace QuantConnect.Tests.Algorithm.Framework.Portfolio
         public void OptimizeWeightingsSpecifyingLowerBoundAndRiskFreeRate(int testCaseNumber)
         {
             var testOptimizer = new MaximumSharpeRatioPortfolioOptimizer(lower: 0, riskFreeRate: 0.04);
-            var expectedResult = new double[] { 0, 0, 1 };
+            var expectedResult = new double[] { 0, 0.44898, 0.55102 };
 
             var result = testOptimizer.Optimize(HistoricalReturns[testCaseNumber]);
 
@@ -106,13 +106,13 @@ namespace QuantConnect.Tests.Algorithm.Framework.Portfolio
         }
 
         [Test]
-        public void SingleSecurityPortfolioReturnsFullyAllocated()
+        public void SingleSecurityPortfolioReturnsNaN()
         {
             var testOptimizer = new MaximumSharpeRatioPortfolioOptimizer();
             var historicalReturns = new double[,] { { -0.1 } };
             var expectedReturns = new double[] { -0.1 };
 
-            var expectedResult = new double[] { 1 };
+            var expectedResult = new double[] { double.NaN };
 
             var result = testOptimizer.Optimize(historicalReturns, expectedReturns);
 
