@@ -127,6 +127,8 @@ namespace QuantConnect.Algorithm.Framework.Portfolio
 
             var budgetConstraint = Vector.Create(variableCount, 1.0);
             budgetConstraint[scaleIndex] = -1;
+            var scaleConstraint = new double[variableCount];
+            scaleConstraint[scaleIndex] = 1;
 
             var constraints = new List<LinearConstraint>
             {
@@ -152,7 +154,7 @@ namespace QuantConnect.Algorithm.Framework.Portfolio
             // t >= 0
             constraints.Add(new LinearConstraint(variableCount)
             {
-                CombinedAs = Vector.OneHot(variableCount, scaleIndex),
+                CombinedAs = scaleConstraint,
                 ShouldBe = ConstraintType.GreaterThanOrEqualTo,
                 Value = 0
             });
