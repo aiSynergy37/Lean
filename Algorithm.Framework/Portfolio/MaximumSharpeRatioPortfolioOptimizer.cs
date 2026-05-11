@@ -13,6 +13,7 @@
  * limitations under the License.
 */
 
+using System;
 using System.Collections.Generic;
 using Accord.Math;
 using Accord.Math.Optimization;
@@ -68,13 +69,13 @@ namespace QuantConnect.Algorithm.Framework.Portfolio
         {
             for (int i = 0; i < size; i++)
             {
-                yield return new LinearConstraint(1)
+                yield return new LinearConstraint(size)
                 {
                     VariablesAtIndices = new int[] { i },
                     ShouldBe = ConstraintType.GreaterThanOrEqualTo,
                     Value = _lower
                 };
-                yield return new LinearConstraint(1)
+                yield return new LinearConstraint(size)
                 {
                     VariablesAtIndices = new int[] { i },
                     ShouldBe = ConstraintType.LesserThanOrEqualTo,
@@ -97,35 +98,111 @@ namespace QuantConnect.Algorithm.Framework.Portfolio
 
             var size = covariance.GetLength(0);
             var x0 = Vector.Create(size, 1.0 / size);
-            var k = returns.Dot(x0);
+            if (size <= 1)
+            {
+                return x0;
+            }
+
+            var initialPortfolioReturn = returns.Dot(x0);
+            if (Math.Abs(initialPortfolioReturn) < 1e-12)
+            {
+                return x0;
+            }
+
+            var variableCount = size + 1;
+            var scaleIndex = size;
+            var initialScale = 1 / initialPortfolioReturn;
+            var initialGuess = new double[variableCount];
+            for (var i = 0; i < size; i++)
+            {
+                initialGuess[i] = x0[i] * initialScale;
+            }
+            initialGuess[scaleIndex] = initialScale;
+
+            var returnConstraint = new double[variableCount];
+            for (var i = 0; i < size; i++)
+            {
+                returnConstraint[i] = returns[i];
+            }
+
+            var budgetConstraint = Vector.Create(variableCount, 1.0);
+            budgetConstraint[scaleIndex] = -1;
 
             var constraints = new List<LinearConstraint>
             {
                 // Sharpe Maximization under Quadratic Constraints
                 // https://quant.stackexchange.com/questions/18521/sharpe-maximization-under-quadratic-constraints
-                // (µ − r_f)^T w = k
-                new LinearConstraint(size)
+                // Charnes-Cooper substitution: y = t*w, t = 1 / ((µ - r_f)^T w)
+                new LinearConstraint(variableCount)
                 {
-                    CombinedAs = returns,
+                    CombinedAs = returnConstraint,
                     ShouldBe = ConstraintType.EqualTo,
-                    Value = k
+                    Value = 1
                 }
             };
 
-            // Σw = 1
-            constraints.Add(GetBudgetConstraint(size));
+            // 1^T y = t
+            constraints.Add(new LinearConstraint(variableCount)
+            {
+                CombinedAs = budgetConstraint,
+                ShouldBe = ConstraintType.EqualTo,
+                Value = 0
+            });
 
-            // lw ≤ w ≤ up
-            constraints.AddRange(GetBoundaryConditions(size));
+            // t >= 0
+            constraints.Add(new LinearConstraint(variableCount)
+            {
+                VariablesAtIndices = new[] { scaleIndex },
+                ShouldBe = ConstraintType.GreaterThanOrEqualTo,
+                Value = 0
+            });
+
+            // lower * t <= y_i <= upper * t
+            for (var i = 0; i < size; i++)
+            {
+                var lowerBoundConstraint = new double[variableCount];
+                lowerBoundConstraint[i] = 1;
+                lowerBoundConstraint[scaleIndex] = -_lower;
+                constraints.Add(new LinearConstraint(variableCount)
+                {
+                    CombinedAs = lowerBoundConstraint,
+                    ShouldBe = ConstraintType.GreaterThanOrEqualTo,
+                    Value = 0
+                });
+
+                var upperBoundConstraint = new double[variableCount];
+                upperBoundConstraint[i] = 1;
+                upperBoundConstraint[scaleIndex] = -_upper;
+                constraints.Add(new LinearConstraint(variableCount)
+                {
+                    CombinedAs = upperBoundConstraint,
+                    ShouldBe = ConstraintType.LesserThanOrEqualTo,
+                    Value = 0
+                });
+            }
 
             // Setup solver
-            var optfunc = new QuadraticObjectiveFunction(covariance, Vector.Create(size, 0.0));
+            var objective = new double[variableCount, variableCount];
+            for (var row = 0; row < size; row++)
+            {
+                for (var column = 0; column < size; column++)
+                {
+                    objective[row, column] = covariance[row, column];
+                }
+            }
+            objective[scaleIndex, scaleIndex] = 1e-12;
+
+            var optfunc = new QuadraticObjectiveFunction(objective, Vector.Create(variableCount, 0.0));
             var solver = new GoldfarbIdnani(optfunc, constraints);
 
             // Solve problem
-            var success = solver.Minimize(Vector.Copy(x0));
-            var sharpeRatio = returns.Dot(solver.Solution) / solver.Value;
-            return success ? solver.Solution : x0;
+            var success = solver.Minimize(initialGuess);
+            if (!success || Math.Abs(solver.Solution[scaleIndex]) < 1e-12)
+            {
+                return x0;
+            }
+
+            return solver.Solution.Get(0, size).Divide(solver.Solution[scaleIndex]);
         }
     }
 }

@@ -17,7 +17,7 @@ from scipy.optimize import minimize
 ### <summary>
 ### Provides an implementation of a portfolio optimizer that maximizes the portfolio Sharpe Ratio.
 ### The interval of weights in optimization method can be changed based on the long-short algorithm.
-### The default model uses flat risk free rate and weight for an individual security range from -1 to 1.'''
+### The default model uses flat risk free rate and weight for an individual security range from -1 to 1.
 ### </summary>
 class MaximumSharpeRatioPortfolioOptimizer:
     '''Provides an implementation of a portfolio optimizer that maximizes the portfolio Sharpe Ratio.
@@ -55,26 +55,26 @@ class MaximumSharpeRatioPortfolioOptimizer:
 
         size = covariance.columns.size   # K x 1
         x0 = np.array(size * [1. / size])
-        k = expected_returns.dot(x0)
+        if size <= 1:
+            return x0
 
-        # Sharpe Maximization under Quadratic Constraints
-        # https://quant.stackexchange.com/questions/18521/sharpe-maximization-under-quadratic-constraints
-        # (µ − r_f)^T w = k
-        constraints = [
-            {'type': 'eq', 'fun': lambda weights: expected_returns.dot(weights) - k}]
+        constraints = [{'type': 'eq', 'fun': lambda weights: self.get_budget_constraint(weights)}]
 
-        # Σw = 1
-        constraints.append(
-            {'type': 'eq', 'fun': lambda weights: self.get_budget_constraint(weights)})
-
-        opt = minimize(lambda weights: self.portfolio_variance(weights, covariance),   # Objective function
-                       x0,                                                        # Initial guess
-                       bounds = self.get_boundary_conditions(size),               # Bounds for variables: lw ≤ w ≤ up
-                       constraints = constraints,                                 # Constraints definition
-                       method='SLSQP')        # Optimization method:  Sequential Least SQuares Programming
-        sharpe_ratio = expected_returns.dot(opt['x']) / opt.fun
+        opt = minimize(lambda weights: self.negative_sharpe_ratio(weights, expected_returns, covariance),
+                       x0,
+                       bounds = self.get_boundary_conditions(size),
+                       constraints = constraints,
+                       method='SLSQP')
 
         return opt['x'] if opt['success'] else x0
+
+    def negative_sharpe_ratio(self, weights, expected_returns, covariance):
+        '''Computes the negative portfolio Sharpe ratio'''
+        variance = self.portfolio_variance(weights, covariance)
+        if variance <= 0:
+            return np.inf
+
+        return -expected_returns.dot(weights) / np.sqrt(variance)
 
     def portfolio_variance(self, weights, covariance):
         '''Computes the portfolio variance
