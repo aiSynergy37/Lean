@@ -15,12 +15,14 @@
 */
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using QuantConnect.Algorithm;
 using QuantConnect.Data;
+using QuantConnect.Data.Market;
 using QuantConnect.Data.UniverseSelection;
 using QuantConnect.Lean.Engine.DataFeeds;
 using QuantConnect.Logging;
@@ -46,6 +48,29 @@ namespace QuantConnect.Tests.Engine.DataFeeds
 
             var algorithm = PerformanceBenchmarkAlgorithms.CreateBenchmarkAlgorithm(securityCount, resolution);
             TestSubscriptionSynchronizerSpeed(algorithm);
+        }
+
+        [Test]
+        public void OrdersUniverseSelectionByResolutionThenSelectionOrder()
+        {
+            using var firstMinuteUniverse = CreateUniverse(Symbols.SPY, Resolution.Minute, 1);
+            using var secondMinuteUniverse = CreateUniverse(Symbols.AAPL, Resolution.Minute, 2);
+            using var secondUniverse = CreateUniverse(Symbols.IBM, Resolution.Second, 3);
+            var universeData = new Dictionary<Universe, BaseDataCollection>
+            {
+                { secondMinuteUniverse, new BaseDataCollection(DateTime.UtcNow, secondMinuteUniverse.Symbol) },
+                { secondUniverse, new BaseDataCollection(DateTime.UtcNow, secondUniverse.Symbol) },
+                { firstMinuteUniverse, new BaseDataCollection(DateTime.UtcNow, firstMinuteUniverse.Symbol) }
+            };
+
+            var orderedUniverses = SubscriptionSynchronizer
+                .OrderUniverseDataForSelection(universeData)
+                .Select(x => x.Key)
+                .ToList();
+
+            Assert.AreSame(secondUniverse, orderedUniverses[0]);
+            Assert.AreSame(firstMinuteUniverse, orderedUniverses[1]);
+            Assert.AreSame(secondMinuteUniverse, orderedUniverses[2]);
         }
 
         private void TestSubscriptionSynchronizerSpeed(QCAlgorithm algorithm)
@@ -147,6 +172,20 @@ namespace QuantConnect.Tests.Engine.DataFeeds
             dataPointCount = data.Count;
             var subscriptionRequest = new SubscriptionRequest(false, universe, security, config, startTimeUtc, endTimeUtc);
             return new Subscription(subscriptionRequest, data.GetEnumerator(), offsetProvider);
+        }
+
+        private static FuncUniverse CreateUniverse(Symbol symbol, Resolution resolution, int selectionOrder)
+        {
+            var universe = new FuncUniverse(
+                new SubscriptionDataConfig(typeof(TradeBar), symbol, resolution, TimeZones.NewYork, TimeZones.NewYork, false, false, true),
+                new UniverseSettings(resolution, 2, true, false, TimeSpan.Zero),
+                data => data.Select(x => x.Symbol)
+            )
+            {
+                SelectionOrder = selectionOrder
+            };
+
+            return universe;
         }
 
         private class DataPoint : BaseData
