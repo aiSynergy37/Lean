@@ -56,7 +56,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Annual Variance", "0"},
             {"Information Ratio", "1.511"},
             {"Tracking Error", "0.429"},
-            {"Treynor Ratio", "-84.756"},
+            {"Treynor Ratio", "-84.947"},
             {"Total Fees", "$1.42"},
             {"Estimated Strategy Capacity", "$540000000.00"},
             {"Lowest Capacity Asset", "ES XCZJLDRF238K|ES XCZJLC9NOB29"},
