@@ -152,7 +152,7 @@ namespace QuantConnect.Algorithm.Framework.Portfolio
             // t >= 0
             constraints.Add(new LinearConstraint(variableCount)
             {
-                VariablesAtIndices = new[] { scaleIndex },
+                CombinedAs = Vector.OneHot(variableCount, scaleIndex),
                 ShouldBe = ConstraintType.GreaterThanOrEqualTo,
                 Value = 0
             });
